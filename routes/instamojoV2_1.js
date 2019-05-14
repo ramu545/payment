@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-const controllers = require('../modules/instamojo/controllers');
+const controllers = require('../modules/instamojoV2_1/controllers');
 
 async function instamojoMojoAppTokenCheck(req, res, next) {
   let accessToken;

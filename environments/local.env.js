@@ -1,4 +1,4 @@
-const instamojoUrls = require('../modules/instamojo/utils/requestUrls');
+const instamojoUrls = require('../modules/instamojoV2_1/utils/requestUrls');
 
 const mongooseOptions = {
   useNewUrlParser: true,
