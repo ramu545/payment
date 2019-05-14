@@ -15,6 +15,7 @@
     "mongoose": "^5.4.6",
     "morgan": "~1.9.0",
     "request": "^2.88.0",
+    "uuid": "^3.3.2",
     "winston": "^3.1.0",
     "winston-daily-rotate-file": "^3.6.0"
   },

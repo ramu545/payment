@@ -16,6 +16,10 @@ function getMessage() {
       data: { message: 'Fetched', type: 'success', data: {} },
       status: 200,
     },
+    PAYMENT_LINK_CREATED: {
+      data: { message: 'Payment link created.', type: 'success', data: {} },
+      status: 200,
+    },
   };
 
   const errorMessages = {

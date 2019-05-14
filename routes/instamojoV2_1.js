@@ -30,4 +30,13 @@ router.post('/userSignup', instamojoMojoAppTokenCheck, (req, res, next) => {
     .catch(next);
 });
 
+router.post('/paymentReq', instamojoMojoAppTokenCheck, (req, res, next) => {
+  controllers.instaPayment.createPaymentReq(req.body, req.accessToken)
+    .then((info) => {
+      console.log(info);
+      res.status(info.status).send(info.data);
+    })
+    .catch(next);
+});
+
 module.exports = router;
