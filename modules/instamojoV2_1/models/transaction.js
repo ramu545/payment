@@ -5,10 +5,12 @@ const { Schema } = mongoose;
 const transactionSchema = new Schema(
   {
     transactionId: String,
-    outletId: '',
-    orderId: '',
+    outletId: String,
+    orderId: String,
     payReqDetails: Object,
     payDetails: Object,
+    webhookData: Object,
+    paymentId: String,
     payStatus: String,
     refundStatus: String,
     refundDetails: Object,

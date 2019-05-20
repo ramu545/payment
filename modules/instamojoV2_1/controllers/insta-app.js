@@ -1,5 +1,4 @@
 const { serviceCaller, serviceOptions, asyncMongoose } = require('../../utils');
-const utils = require('../utils');
 const { InstaCredModel } = require('../models');
 
 async function login() {
@@ -19,17 +18,4 @@ async function login() {
   return Promise.resolve(loginResp);
 }
 
-async function checkAppAccessToken() {
-  const instamojoSpecs = global.services('instamojo');
-  const { loginTime, expiresIn, accessToken } = await asyncMongoose.findOneDoc(
-    {
-      clientId: instamojoSpecs.CLIENTID,
-    },
-    InstaCredModel,
-    { loginTime: 1, expiresIn: 1, accessToken: 1 },
-  );
-  const tokenValid = utils.checkTokenTimeValidty(new Date(loginTime), expiresIn);
-  return Promise.resolve({ tokenValid, accessToken });
-}
-
-module.exports = { login, checkAppAccessToken };
+module.exports = { login };

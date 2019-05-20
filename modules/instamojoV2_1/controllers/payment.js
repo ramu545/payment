@@ -45,10 +45,19 @@ async function createPaymentReq(payload, appAccessToken) {
     payDetails: {},
     refundStatus: null,
     refundDetails: {},
+    paymentId: null,
+    webhookData: {},
   });
   const saveInfo = await asyncMongoose.saveDoc(newTransaction);
   console.log(saveInfo);
-  return Promise.resolve(global.messages.success('PAYMENT_LINK_CREATED', '', { link: payReqResp.longurl }));
+  return Promise.resolve(global.messages.success('PAYMENT_LINK_CREATED', '', { link: payReqResp.longurl, transactionId: newTransaction.transactionId }));
 }
 
-module.exports = { createPaymentReq };
+async function addWebhookData(data) {
+  const payReqUpdate = await asyncMongoose.updateOne(InstaTransaction, { 'payReqDetails.id': data.payment_request_id }, { webhookData: data, paymentId: data.payment_id });
+  console.log(payReqUpdate);
+  return Promise.resolve('done');
+}
+
+
+module.exports = { createPaymentReq, addWebhookData };

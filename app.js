@@ -42,6 +42,7 @@ app.use((err, req, res, next) => {
     console.log(httpError);
     res.status(httpError.status || 500).send(httpError.data);
   }
+  next();
 });
 
 module.exports = app;

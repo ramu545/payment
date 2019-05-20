@@ -1,9 +1,12 @@
 const { serviceCaller, serviceOptions, asyncMongoose } = require('../../utils');
-const utils = require('../utils');
-
 const { InstaUserModel } = require('../models');
 
-async function login(userId, username, password) {
+//  here user id is the restaurant id
+async function login(userId) {
+  const { username, password } = await asyncMongoose.findOneDoc(
+    { userId },
+    InstaUserModel, { username: 1, password: 1 },
+  );
   const instamojoSpecs = global.services('instamojo');
   const payload = {
     grant_type: instamojoSpecs.GRANT_PASSWORD,
@@ -27,17 +30,6 @@ async function login(userId, username, password) {
     });
   console.log(updateInfo);
   return Promise.resolve(loginResp);
-}
-
-async function checkUserAccessToken(userId) {
-  const { loginTime, expiresIn } = await asyncMongoose.findOneDoc(
-    {
-      userId,
-    },
-    InstaUserModel,
-    { loginTime: 1, expiresIn: 1 },
-  );
-  return utils.checkTokenTimeValidty(new Date(loginTime), expiresIn);
 }
 
 async function signup(payload, appAccessToken) {
@@ -80,4 +72,34 @@ async function signup(payload, appAccessToken) {
   return Promise.resolve(global.messages.success('PROFILE_CREATED'));
 }
 
-module.exports = { login, checkUserAccessToken, signup };
+/**
+ *
+ * @param {phone | first_name | last_name | location} data
+ */
+async function updateUserDetails(data, accessToken) {
+  const { gatewayId } = await asyncMongoose
+    .findOneDoc(
+      { userId: data.userId },
+      InstaUserModel, { gatewayId: 1 },
+    );
+  const userUpdateOptions = serviceOptions('instamojo', 'UPDATE_USER', data.instaUpdate, '', [{ id: gatewayId }], 'body', { Authorization: `Bearer ${accessToken}` });
+  const updateInfo = await serviceCaller(userUpdateOptions);
+  const {
+    first_name: firstName,
+    last_name: lastName,
+    location,
+    phone,
+  } = updateInfo;
+  const dbUpdateInfo = await asyncMongoose.updateOne(InstaUserModel, { userId: data.userId },
+    {
+      firstName, lastName, location, phone,
+    });
+  console.log(dbUpdateInfo);
+  return Promise.resovle(global.messages.success('DATA_UPDATED'));
+}
+
+module.exports = {
+  login,
+  signup,
+  updateUserDetails,
+};
