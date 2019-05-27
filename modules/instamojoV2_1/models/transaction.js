@@ -9,7 +9,7 @@ const transactionSchema = new Schema(
     orderId: String,
     payReqDetails: Object,
     payDetails: Object,
-    webhookData: Object,
+    webhookData: [Object],
     paymentId: String,
     payStatus: String,
     refundStatus: String,
