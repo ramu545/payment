@@ -1,5 +1,5 @@
 const instamojoUrls = require('../modules/instamojoV2_1/utils/requestUrls');
-
+const instamojoUrlsV1 = require('../modules/instamojoV1/utils/requestUrls');
 const mongooseOptions = {
   useNewUrlParser: true,
   reconnectTries: 30,
@@ -30,6 +30,14 @@ const services = {
     GRANT_REFRESH_TOKEN: 'refresh_token',
     BASE_URL: 'https://test.instamojo.com',
     ...instamojoUrls(),
+  },
+  instamojoV1: {
+    API_KEY: 'test_d0d20f1f501723e824c1732f385',
+    AUTH_TOKEN: 'test_3f29d0e77d041470f496db629b1',
+    REFERRER: 'test_laalsa',
+    // PRIVATE_SALT : '739abbce38fa433bbeb74be882c17d37',
+    BASE_URL: 'https://test.instamojo.com/api/1.1',
+    ...instamojoUrlsV1(),
   },
 };
 

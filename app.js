@@ -10,12 +10,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const router = require('./routes');
+// const router = require('./routes');
 
+const router = require('./routesV1/instamojoV1');
 app.use('/*', (req, res, next) => {
   console.log(req.originalUrl);
   next();
 });
+
 
 app.use('/', router);
 // catch 404 and forward to error handler
