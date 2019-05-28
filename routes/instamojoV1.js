@@ -4,7 +4,7 @@ const router = express.Router();
 const controllers = require('../modules/instamojoV1/controllers');
 
 router.post('/createPaymentRequest', (req, res, next) => {
-  controllers.instaPayment.createPayment(req.body, req.headers)
+  controllers.instaPayment.createPayment(req.body)
     .then((info) => {
       console.log('payment request data      ------ >>> ', info.data);
       res.status(info.status).send(info.data);
@@ -28,65 +28,68 @@ router.post('/webhook/', (req, res, next) => {
     .then((info) => {
       console.log('data Updated ', info);
       // do nothing
-      // res.status(info.status).send(info.data);
+      res.status(info.status).send(info.data);
     })
     .catch(next);
 }); // Get Responce From instamojo 
 
 
 router.get('/listPaymentRequest/', (req, res, next) => {
-  controllers.instaPayment.listPayments(req.query, req.headers)
+  controllers.instaPayment.listPayments(req.query)
     .then((info) => {
       console.log('payment request data      ------ >>> ', info);
-      // res.status(info.status).send(info);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); // List Of all Payment Requests
 
 router.get('/PaymentRequestDetails/:id/', (req, res, next) => {
-  controllers.instaPayment.getPaymentRequestDetails(req.params, req.headers)
+  controllers.instaPayment.getPaymentRequestDetails(req.params)
     .then((info) => {
       console.log('payment request Details      ------ >>> ', info);
-      // res.status(info.status).send(info);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); // Payment request Details with Order_Id
 
 router.get('/PaymentReqIdPaymentID/:id/:payment_id/', (req, res, next) => {
-  controllers.instaPayment.PaymentReqIdPaymentID(req.params, req.headers)
+  controllers.instaPayment.PaymentReqIdPaymentID(req.params)
     .then((info) => {
       console.log('payment request Payment_Id      ------ >>> ', info);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); // Payment Request with Order_Id And Payment_Id
 
 router.post('/createRefundRequest/', (req, res, next) => {
-  controllers.instaPayment.createRefund(req.body, req.headers)
+  controllers.instaPayment.createRefund(req.body)
     .then((info) => {
       console.log('payment Create Refund      ------ >>> ', info);
-      // res.status(info.status).send(info.data);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); // Refund Request Creating 
 
 router.get('/listOfRefunds/', (req, res, next) => {
-  controllers.instaPayment.refundList(req.params, req.headers)
+  controllers.instaPayment.refundList(req.params)
     .then((info) => {
       console.log('payment Refund List      ------ >>> ', info);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); // get all refunds List 
 
 router.get('/DetailsOfRefunds/:id', (req, res, next) => {
-  controllers.instaPayment.detailsOfRefunds(req.params, req.headers)
+  controllers.instaPayment.detailsOfRefunds(req.params)
     .then((info) => {
       console.log('payment Details of Refund      ------ >>> ', info);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); // Get Refund Details only
 
 // router.get('/payments/:id', (req, res, next) => {
-//   controllers.instaPayment.paymentdetailId(req.params, req.headers)
+//   controllers.instaPayment.paymentdetailId(req.params)
 //     .then((info) => {
 //       console.log('payment Details      ------ >>> ', info);
 //     })
@@ -94,17 +97,19 @@ router.get('/DetailsOfRefunds/:id', (req, res, next) => {
 // }); // Payment Details for Id Base
 
 router.post('/paymentsDesable/:id/disable/', (req, res, next) => {
-  controllers.instaPayment.desablePayments(req.params, req.headers)
+  controllers.instaPayment.desablePayments(req.params)
     .then((info) => {
       console.log('payment Desable      ------ >>> ', info);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); //Payment request Desable
 
 router.post('/paymentsEnable/:id/enable/', (req, res, next) => {
-  controllers.instaPayment.enablePayments(req.params, req.headers)
+  controllers.instaPayment.enablePayments(req.params)
     .then((info) => {
       console.log('payment Enable      ------ >>> ', info);
+      res.status(info.status).send(info);
     })
     .catch(next);
 }); //Payment request Enable

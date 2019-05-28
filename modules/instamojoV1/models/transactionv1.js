@@ -14,4 +14,4 @@ const InstaPayment = new Schema({
   refundDetails: Object,
 })
 
-module.exports = mongoose.model('instatransaction', InstaPayment);
+module.exports = mongoose.model('instatransactionv1', InstaPayment);

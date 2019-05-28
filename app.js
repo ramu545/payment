@@ -10,9 +10,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// const router = require('./routes');
-
-const router = require('./routesV1/instamojoV1');
+// const router = require('./routes/index');
+const router = require('./routes/instamojoV1');
 app.use('/*', (req, res, next) => {
   console.log(req.originalUrl);
   next();

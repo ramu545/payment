@@ -1,14 +1,17 @@
 const uuid = require('uuid/v1');
 const { serviceCaller, serviceOptions, asyncMongoose } = require('../../utils');
-const { InstaTransaction } = require('../models');
+const { InstaTransactionV1 } = require('../models');
+const appAccessToken = require('../../../config/config');
 
-async function createPayment(payload, appAccessToken) {
+const extraHeaders = { "x-auth-token": appAccessToken.AUTH_TOKEN, "x-api-key":appAccessToken.API_KEY };
+console.log('access Headers    ', extraHeaders);
+async function createPayment(payload) {
   const existingReq = await asyncMongoose.findOneDoc(
       {
           orderId: payload.orderId,
           payStatus: { $ne: 'false' },
       },
-      InstaTransaction,
+      InstaTransactionV1,
       { 'payReqDetails.id': 1, transactionId: 1, 'payReqDetails.logurl': 1 },
   );
   if (existingReq) {
@@ -29,14 +32,13 @@ async function createPayment(payload, appAccessToken) {
   payload.sendSms && (reqPayload.send_sms = payload.sendSms);
   console.log('pay load     ==== > ', payload);
 
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
   const payReqOptions = serviceOptions('instamojoV1', 'CREATE_PAYMENT_REQ', reqPayload, '', [], 'body', extraHeaders);
   console.log('pay request options         ', payReqOptions);
   const payReqResp = await serviceCaller(payReqOptions);
   console.log('payReqCreated');
   let url_string = payReqResp.payment_request.longurl;
   let payUriId = url_string.substring(url_string.lastIndexOf('/') + 1);
-  const newTransaction = new InstaTransaction({
+  const newTransaction = new InstaTransactionV1({
     transactionId: uuid(),
     refID: payUriId,
     orderId: payload.orderId,
@@ -55,20 +57,19 @@ async function createPayment(payload, appAccessToken) {
 
 async function addRedirectV1(data) {
   if (data.payment_status == 'Credit') {
-    const payReqUpdate = await asyncMongoose.updateOne(InstaTransaction, { refID: data.payment_request_id }, { 'payReqDetails.id': data.payment_request_id }, { webhookData: data, paymentId: data.payment_id });
+    const payReqUpdate = await asyncMongoose.updateOne(InstaTransactionV1, { refID: data.payment_request_id }, { 'payReqDetails.id': data.payment_request_id }, { webhookData: data, paymentId: data.payment_id });
     return Promise.resolve(payReqUpdate);
   }
 }
 
 async function addWebhookDataV1(data) {
   if (data.status == 'Credit') {
-    const payReqUpdate = await asyncMongoose.updateOne(InstaTransaction, { refID: data.payment_request_id }, { 'payReqDetails.id': data.payment_request_id }, { webhookData:{ $push: { data } }, paymentId: data.payment_id });
+    const payReqUpdate = await asyncMongoose.updateOne(InstaTransactionV1, { refID: data.payment_request_id }, { 'payReqDetails.id': data.payment_request_id }, { webhookData:{ $push: { data } }, paymentId: data.payment_id });
     return Promise.resolve(payReqUpdate);
   }
 }
 
-async function listPayments(payload, appAccessToken) {
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function listPayments(payload) {
   const reqPayload = {};
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'LIST_OF_PAYMENT_REQ', reqPayload, '', [], 'body', extraHeaders);
@@ -76,8 +77,7 @@ async function listPayments(payload, appAccessToken) {
   return Promise.resolve(payReqResp);
 }
 
-async function getPaymentRequestDetails(payload, appAccessToken){
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function getPaymentRequestDetails(payload){
   const reqPayload = {};
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'GET_PAYMENT_REQ_ID', reqPayload, '', [params], 'body', extraHeaders);
@@ -85,8 +85,7 @@ async function getPaymentRequestDetails(payload, appAccessToken){
   return Promise.resolve(payReqResp);
 }
 
-async function PaymentReqIdPaymentID(payload, appAccessToken){
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function PaymentReqIdPaymentID(payload){
   const reqPayload = {};
   let params = {key: "id",value : payload.id };
   let params_id = {key: "payment_id",value :  payload.payment_id};
@@ -95,32 +94,29 @@ async function PaymentReqIdPaymentID(payload, appAccessToken){
   return Promise.resolve(payReqResp);
 }
 
-async function createRefund(payload, appAccessToken){
+async function createRefund(payload){
   const reqPayload = {
     transaction_id: payload.transaction_id,
     payment_id: payload.payment_id,
     type: "QFL",
     body: "Customer isn't satisfied with the quality",
   };
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
   const payReqOptions = serviceOptions('instamojoV1', 'CREATE_REFUND', reqPayload, '', [], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
   if(payReqResp.success == true){
-    const payReqUpdate = await asyncMongoose.updateOne(InstaTransaction, { refID: payload.transaction_id }, { refundDetails: payReqResp.refund }, { refundStatus: payReqResp.refund.status, paymentId: payReqResp.refund.payment_id });
+    const payReqUpdate = await asyncMongoose.updateOne(InstaTransactionV1, { refID: payload.transaction_id }, { refundDetails: payReqResp.refund }, { refundStatus: payReqResp.refund.status, paymentId: payReqResp.refund.payment_id });
     return Promise.resolve(payReqUpdate);
   }
 }
 
-async function refundList(payload, appAccessToken){
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function refundList(payload){
   const reqPayload = {};
   const payReqOptions = serviceOptions('instamojoV1', 'GET_LIST_OF_REFUNDS', reqPayload, '', [], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
   return Promise.resolve(payReqResp);
 }
 
-async function detailsOfRefunds(payload, appAccessToken){
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function detailsOfRefunds(payload){
   const reqPayload = {};
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'GET_DETAILS_OF_A_REFUND', reqPayload, '', [params], 'body', extraHeaders);
@@ -128,8 +124,7 @@ async function detailsOfRefunds(payload, appAccessToken){
   return Promise.resolve(payReqResp);
 }
 
-async function paymentdetailId(payload, appAccessToken){
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function paymentdetailId(payload){
   const reqPayload = {};
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'GET_PAYMENT_DETAILS_ID', reqPayload, '', [params], 'body', extraHeaders);
@@ -138,8 +133,7 @@ async function paymentdetailId(payload, appAccessToken){
   return Promise.resolve(payReqResp);
 }
 
-async function desablePayments(payload, appAccessToken){
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function desablePayments(payload){
   const reqPayload = {};
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'DISABLE_A_REQUEST', reqPayload, '', [params], 'body', extraHeaders);
@@ -147,8 +141,7 @@ async function desablePayments(payload, appAccessToken){
   return Promise.resolve(payReqResp);
 }
 
-async function enablePayments(payload, appAccessToken){
-  const extraHeaders = { "x-auth-token": appAccessToken['x-auth-token'], "x-api-key": appAccessToken['x-api-key'] };
+async function enablePayments(payload){
   const reqPayload = {};
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'ENABLE_A_REQUEST', reqPayload, '', [params], 'body', extraHeaders);

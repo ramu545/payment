@@ -1,3 +1,3 @@
-const InstaTransaction = require('./transaction');
+const InstaTransactionV1 = require('./transactionv1');
 
-module.exports = { InstaTransaction };
+module.exports = { InstaTransactionV1 };
