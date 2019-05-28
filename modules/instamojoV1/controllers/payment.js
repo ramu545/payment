@@ -1,5 +1,5 @@
 const uuid = require('uuid/v1');
-const { serviceCaller, serviceOptions, asyncMongoose } = require('../../utilsV1');
+const { serviceCaller, serviceOptions, asyncMongoose } = require('../../utils');
 const { InstaTransaction } = require('../models');
 
 async function createPayment(payload, appAccessToken) {
