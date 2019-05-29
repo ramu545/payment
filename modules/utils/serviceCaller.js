@@ -11,7 +11,7 @@ module.exports = function handleServiceCall(options) {
         reject({ message: 'UNKNOWN' });
       } else {
         console.log('responce from service');
-        // console.log(body);
+        console.log('service call responce    ',body);
         // resolve({});
         // body = JSON.parse(body);
         if (Math.floor(httpResp.statusCode / 100) === 2) {

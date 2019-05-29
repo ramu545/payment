@@ -12,15 +12,18 @@ async function createPayment(payload) {
           payStatus: { $ne: 'false' },
       },
       InstaTransactionV1,
-      { 'payReqDetails.id': 1, transactionId: 1, 'payReqDetails.logurl': 1 },
+      { 'payReqDetails.id': 1, transactionId: 1, payReqUri: 1 },
   );
+  console.log('existing request ', existingReq);
+  
   if (existingReq) {
       console.log('link already active', existingReq);
-      return Promise.resolve(global.messages.success('PAYMENT_LINK_CREATED', '', { link: existingReq.longurl, transactionId: 1 }));
+      return Promise.resolve(global.messages.success('PAYMENT_LINK_CREATED', '', { link: existingReq.payReqUri, transactionId: 1 }));
   }
   const reqPayload = {
     purpose: payload.purpose,
     amount: payload.amount,
+    buyer_name:payload.buyer_name,
     webhook: payload.webhook,
     allow_repeated_payments: 'False',
   };
@@ -43,6 +46,7 @@ async function createPayment(payload) {
     refID: payUriId,
     orderId: payload.orderId,
     payReqDetails: payReqResp,
+    payReqUri : url_string,
     payStatus: null,
     payDetails: {},
     refundStatus: null,
@@ -74,7 +78,8 @@ async function listPayments(payload) {
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'LIST_OF_PAYMENT_REQ', reqPayload, '', [], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  // console.log('List of payments',payReqResp); //amount
+  return Promise.resolve(global.messages.success('LIST_OF_PAYMENTS', '', { data: payReqResp }));
 }
 
 async function getPaymentRequestDetails(payload){
@@ -82,7 +87,7 @@ async function getPaymentRequestDetails(payload){
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'GET_PAYMENT_REQ_ID', reqPayload, '', [params], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  return Promise.resolve(global.messages.success('PAYMENT_REQUEST_DETAILS', '', { data: payReqResp }));
 }
 
 async function PaymentReqIdPaymentID(payload){
@@ -91,7 +96,7 @@ async function PaymentReqIdPaymentID(payload){
   let params_id = {key: "payment_id",value :  payload.payment_id};
   const payReqOptions = serviceOptions('instamojoV1', 'GET_PAYMENT_DETAILS', reqPayload, '', [params,params_id], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  return Promise.resolve(global.messages.success('PAYMENT_REQUEST_DETAILS_DATA', '', { data: payReqResp }));
 }
 
 async function createRefund(payload){
@@ -105,7 +110,7 @@ async function createRefund(payload){
   const payReqResp = await serviceCaller(payReqOptions);
   if(payReqResp.success == true){
     const payReqUpdate = await asyncMongoose.updateOne(InstaTransactionV1, { refID: payload.transaction_id }, { refundDetails: payReqResp.refund }, { refundStatus: payReqResp.refund.status, paymentId: payReqResp.refund.payment_id });
-    return Promise.resolve(payReqUpdate);
+    return Promise.resolve(global.messages.success('CREATE_REFUND', '', { data: payReqUpdate }));
   }
 }
 
@@ -113,7 +118,7 @@ async function refundList(payload){
   const reqPayload = {};
   const payReqOptions = serviceOptions('instamojoV1', 'GET_LIST_OF_REFUNDS', reqPayload, '', [], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  return Promise.resolve(global.messages.success('LIST_OF_REFUND', '', { data: payReqResp }));
 }
 
 async function detailsOfRefunds(payload){
@@ -121,16 +126,17 @@ async function detailsOfRefunds(payload){
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'GET_DETAILS_OF_A_REFUND', reqPayload, '', [params], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  return Promise.resolve(global.messages.success('REFUND_DETAILS', '', { data: payReqResp }));
 }
 
 async function paymentdetailId(payload){
   const reqPayload = {};
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'GET_PAYMENT_DETAILS_ID', reqPayload, '', [params], 'body', extraHeaders);
-  // console.log('pay request options         ', payReqOptions.uri);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  console.log('payreqresp       ',payReqOptions);
+  
+  return Promise.resolve(global.messages.success('PAYMENT_DETAILS', '', { data: payReqResp }));
 }
 
 async function desablePayments(payload){
@@ -138,7 +144,7 @@ async function desablePayments(payload){
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'DISABLE_A_REQUEST', reqPayload, '', [params], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  return Promise.resolve(global.messages.success('DESABLE_PAYMENT', '', { data: payReqResp }));
 }
 
 async function enablePayments(payload){
@@ -146,7 +152,7 @@ async function enablePayments(payload){
   let params = {key: "id",value : payload.id }
   const payReqOptions = serviceOptions('instamojoV1', 'ENABLE_A_REQUEST', reqPayload, '', [params], 'body', extraHeaders);
   const payReqResp = await serviceCaller(payReqOptions);
-  return Promise.resolve(payReqResp);
+  return Promise.resolve(global.messages.success('ENABLE_PAYMENT', '', { data: payReqResp }));
 }
 
 module.exports = { createPayment, addRedirectV1, addWebhookDataV1, listPayments, getPaymentRequestDetails, PaymentReqIdPaymentID, createRefund, refundList, detailsOfRefunds, paymentdetailId, desablePayments, enablePayments };

@@ -42,21 +42,21 @@ router.post('/appLogin', (req, res, next) => {
     .catch(next);
 });
 
-// router.use('/user')
-//   .post(instamojoMojoAppTokenCheck, (req, res, next) => {
-//     controllers.instaUser.signup(req.body, req.accessToken)
-//       .then((info) => {
-//         res.status(info.status).send(info.data);
-//       })
-//       .catch(next);
-//   })
-//   .patch(instamojoMojoUserTokenCheck, (req, res, next) => {
-//     controllers.instaUser.updateUserDetails(req.body, req.accessToken)
-//       .then((info) => {
-//         res.status(info.status).send(info.data);
-//       })
-//       .catch(next);
-//   });
+router.use('/user')
+  .post(instamojoMojoAppTokenCheck, (req, res, next) => {
+    controllers.instaUser.signup(req.body, req.accessToken)
+      .then((info) => {
+        res.status(info.status).send(info.data);
+      })
+      .catch(next);
+  })
+  .patch(instamojoMojoUserTokenCheck, (req, res, next) => {
+    controllers.instaUser.updateUserDetails(req.body, req.accessToken)
+      .then((info) => {
+        res.status(info.status).send(info.data);
+      })
+      .catch(next);
+  });
 
 router.post('/paymentReq', instamojoMojoAppTokenCheck, (req, res, next) => {
   controllers.instaPayment.createPaymentReq(req.body, req.accessToken)

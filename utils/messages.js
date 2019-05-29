@@ -20,6 +20,42 @@ function getMessage() {
       data: { message: 'Payment link created.', type: 'success', data: {} },
       status: 200,
     },
+    LIST_OF_PAYMENTS: {
+      data: { message: 'List Of Payments .', type: 'success', data: {} },
+      status: 200,
+    },
+    PAYMENT_REQUEST_DETAILS: {
+      data: { message: 'Payment Request Details ', type: 'success', data: {} },
+      status: 200,
+    },
+    PAYMENT_REQUEST_DETAILS_DATA :{
+      data: { message: 'Payment Request Details ', type: 'success', data: {} },
+      status: 200,
+    },
+    CREATE_REFUND : {
+      data: { message: 'Creating Refund Request ', type: 'success', data: {} },
+      status: 200,
+    },
+    LIST_OF_REFUND: {
+      data: { message: 'List Of Refunds ', type: 'success', data: {} },
+      status: 200,
+    },
+    REFUND_DETAILS :{
+      data: { message: 'Refund Details ', type: 'success', data: {} },
+      status: 200,
+    },
+    PAYMENT_DETAILS :{
+      data: { message: 'Payment Details ', type: 'success', data: {} },
+      status: 200,
+    },
+    DESABLE_PAYMENT :{
+      data: { message: 'Desable Payment ', type: 'success', data: {} },
+      status: 200,
+    },
+    ENABLE_PAYMENT : {
+      data: { message: 'Enable Payment ', type: 'success', data: {} },
+      status: 200,
+    }
   };
 
   const errorMessages = {

@@ -7,6 +7,7 @@ const InstaPayment = new Schema({
   orderId: String,
   payReqDetails: Object,
   payDetails: Object,
+  payReqUri: String,
   webhookData: [Object],
   paymentId: String,
   payStatus: String,
